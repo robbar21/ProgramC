@@ -1,0 +1,580 @@
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define CARDS 52
+#include <time.h>
+#include <string.h>
+#define CARDS 52
+
+//***********************************
+//Name: Roberto Barone
+//Date: 12/17/2021
+//Class: Cit-145
+//Project: Final Project Casino Games
+//***********************************
+
+//print roulette title
+void print_title(void);
+//Spin roulette
+int spin_roulette(void);
+
+int balance;
+int pot;
+int deck[52];
+int sdeck[52];
+
+void play();
+void turn();
+int hit(int *val);
+char *cface(int v);
+char *csuit(int v);
+int cval(int v);
+void bet();
+void dealer();
+void result();
+void initdeck();
+void shuffle();
+void checkAce(int v1, int v2, int *a1);
+void quit();
+
+
+int main()
+{
+    int userchoice;
+
+    printf("***********************************\n");
+    printf("Hello, Welcome to Roberto's Casino!\n");
+    printf("***********************************\n");
+    printf("There are two games here that you can choose from!\n");
+    printf("Your choices are Blackjack or Roulette!\n");
+    printf("If you would like Roulette, please enter the number 1.\n");
+    printf("If you would like Blackjack, please enter the number 2.\n");
+    scanf("%d", &userchoice);
+
+    if (userchoice==1){
+
+        //Variables
+        int betmode;
+        int straightbet, cashbet, parity;
+        int number;
+        int balance;
+        char colorbet, R, B;
+
+
+        //Arrays for odds, evens, colors and numbers.
+        int red[18]={1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36};
+        int black[18]={2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35};
+
+        //Welcome & Title
+        printf("****************************************\n");
+        print_title();
+        printf("\n****************************************\n");
+
+
+        //Instructions for game
+        printf("Entering the casino, you have $100\n");
+        printf("There are 3 types of bets you can make\n\n");
+        printf("1) Straight-up bet: Pick any of the available numbers. (35 to 1 odds)\n\n");
+        printf("2) Red or black: (1 to 1 odds)\n Red numbers are  1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36\n Black numbers are 2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35\n\n");
+        printf("3) Odd or even: Choose odd or even (1 to 1 odds)");
+
+
+        //For user to select which game they want to play
+        printf("\nPlease select your preferred type of play. By entering 1, 2, or 3\n ");
+        scanf("%d", &betmode);
+        balance=100;
+
+
+        //Loop for game to keep playing
+        while (balance>0)
+        {
+            if (betmode==1)       //Straight bet code
+                {
+                    printf("\n Please enter a number between 1-36 that you are feeling lucky to play.\n ");
+                    scanf("%d", &straightbet);
+                    printf("What is the amount you would like to bet?\n ");
+                    scanf("%d", &cashbet);
+                    printf("\nYou have bet $%d on the number %d", cashbet, straightbet);
+                    printf("\nPress ENTER to spin the roulette.\n");
+                    getchar();
+                    getchar();
+                    spin_roulette();
+                        if (number==straightbet)
+                            {
+                                (balance += (cashbet*35));
+                                printf("Winner Winner! You now have $%d in your pocket", balance);
+                        }//end if
+                        else{
+                                (balance -= cashbet);
+                                printf("Sorry. You've lost $%d. Your new balance is $%d", cashbet, balance);
+                   }//end else
+                }//end betmode 1 if
+            else if (betmode==2)         //game mode type 2 red or black
+                {
+                    printf("\nAlright pick a color. Choose R for RED or B for BLACK\n ");
+                    scanf("&c", &colorbet);
+                    printf("\nWhat is the amount you would like to bet?\n ");
+                    scanf("%d", &cashbet);
+                    printf("\nYou have bet $%d on the color %c", cashbet, colorbet);
+                    printf("\nPress ENTER to spin the roulette. Keep your fingers crossed!");
+                    getchar();
+                    getchar();
+                    spin_roulette();
+
+                        if (colorbet==R){
+
+                            if (number==red[17]) //if user bet on red
+                                {
+                                    (balance += cashbet);
+                                    printf("Winner Winner! You now have $%d in your pocket", balance);
+                                }//end if
+                            else{
+                                    (balance -= cashbet);
+                                    printf("Sorry. You've lost $%d. Your new balance is $%d", cashbet, balance);
+                                }//end else
+                            }//end if for red
+                        else if (colorbet==B) //if user bet on black
+                            {
+                                if (number==black[17]){
+                                    (balance += cashbet);
+                                    printf("Winner Winner! You now have $%d in your pocket", balance);
+                                    }//end if
+                                else{
+                                    (balance -= cashbet);
+                                    printf("Sorry. You've lost $%d. Your new balance is $%d", cashbet, balance);
+                                }//end else
+                            }//end else if
+
+            else if (betmode==3)          //Odd or even mode
+            {
+                printf("For this mode please enter 1 for odd or 2 for even.>\n ");
+                scanf("%d", &parity);
+                printf("\nWhat is the amount you would like to bet?\n ");
+                scanf("%d", &cashbet);
+                    if (parity==1){
+                     printf("\nYou have bet $%d on odds", cashbet);
+                     }//end if
+                  else {
+                      printf("\nYou have bet $%d on evens", cashbet);
+                      }//end else
+                printf("\nPress ENTER to spin the roulette. Keep your fingers crossed!");
+                getchar();
+                getchar();
+                spin_roulette();
+                   if (parity>=1)
+                      {
+                        if (number%2==1){
+                            (balance += cashbet);
+                           printf("Winner Winner! You now have $%d in your pocket", balance);}
+                        else {
+                           (balance -= cashbet);
+                           printf("Sorry. You've lost $%d. Your new balance is $%d", cashbet, balance);
+                        }
+
+                        if (number%2==2){
+                            (balance += cashbet);
+                           printf("Winner Winner! You now have $%d in your pocket", balance);
+                           }//end if
+                        else {
+                           (balance -= cashbet);
+                           printf("Sorry. You've lost $%d. Your new balance is $%d", cashbet, balance);
+                                }//end else
+                           }//end starting if
+
+
+
+
+
+
+                        getchar();
+                        getchar();
+                        return (0);
+                        }//end odd even mod
+
+
+                    }//end bet too
+                }
+
+    }//end roulette choice
+    else if (userchoice==2){
+
+
+        printf("Welcome to BlackJack!");
+        printf("Below are the rules in case you've never played before:\n");
+        printf("Beat the dealer's hand without going over 21.\n");
+        printf("Face cards are worth 10, Aces are worth 1 or 11, whichever makes a better hand.\n");
+        printf("Each player starts with two cards, and one of the dealer's cards is hidden until the end.\n");
+        printf("Type 'hit' to ask for another card. Type 'stand' to hold your total and end your turn.\n");
+        printf("If you go over 21 you bust, and the dealer wins.\n");
+        printf("If you are dealt 21 from the start (Ace & 10), you get a blackjack!\n");
+        printf("If you ever tie the dealer it is then a push.\n");
+        printf("Remember: Type 'hit' to get another card, and 'stand' to hold.");
+        printf("When you begin to play type 'bet' and the number you want to wager.\n");
+        printf("Type 'play' to begin. At any time, you may type 'help' if you get stuck.\n");
+        char input[6];
+        scanf("%5s", input);while(strcmp(input, "quit") != 0){
+        while(strcmp(input, "play") != 0){
+            if(strcmp(input, "help") == 0)
+                printf("Type 'play' to begin the game.\n");
+            else if(strcmp(input, "quit")==0){
+                quit();
+                printf("Enter 'play' to start the game.\n");
+            }else
+                printf("Invalid command, type 'play' to begin.\n");
+            scanf("%s", input);
+        }
+        play();
+        scanf("%5s", input);
+    }//end while loop
+
+
+    }//end blackjack choice
+}//end main
+
+void print_title(void)
+{
+    printf("WELCOME TO THE RISKY GAME OF ROULETTE!");
+}
+
+
+int spin_roulette (void)
+{
+    int number;
+    srand(time(NULL));
+    number=1+(rand()%36);
+    printf("The ball has landed on %d\n", number);
+    return number;
+}//end spin roulette
+
+void play(){
+            printf("Lets start you off with 500 credits.\n");
+            balance = 500;
+            while(balance>0){
+                bet();
+                initdeck();
+                shuffle();
+                turn();
+            }//end while
+            printf("Sorry, it looks like you lost! Type 'play' to play another game.\n");
+        }//end play block blackjack
+void turn(){
+            int inc=0;
+
+            int d1 = hit(&inc);
+            char *cn1 = csuit(d1);
+            char *cf1 = cface(d1);
+            int cv1 = cval(d1);
+
+            printf("You got a %s of %s worth %d, and ", cf1, cn1, cv1);
+
+            int d2 = hit(&inc);
+            char *cn2 = csuit(d2);
+            char *cf2 = cface(d2);
+            int cv2 = cval(d2);
+
+            printf("a %s of %s worth %d.\n", cf2, cn2, cv2);
+
+            int d3 = hit(&inc);
+            char *cn3 = csuit(d3);
+            char *cf3 = cface(d3);
+            int cv3 = cval(d3);
+
+            printf("The dealer's face up card is a %s of %s worth %d.\n", cf3, cn3, cv3);
+
+            int d4 = hit(&inc);
+            char *cn4 = csuit(d4);
+            char *cf4 = cface(d4);
+            int cv4 = cval(d4);
+
+            int ptotal = cv1 + cv2;
+            int dtotal = cv3;
+
+            checkAce(cv1, cv2, &ptotal);
+
+            printf("You have a total of %d points, and the dealer has %d.\n", ptotal, dtotal);
+
+        if(ptotal == 21){
+            printf("Congrats! You got a blackjack!! Your payout is 2-to-1, %d.\n", (int)(pot*2));
+            balance += (pot*2);
+        }//end if
+        else{
+            char input[6];
+            scanf("%5s", input);
+            while(strcmp(input,"stand")!=0){
+                if(strcmp(input,"hit") == 0){
+                    int val = hit(&inc);
+                    char *ns = csuit(val);
+                    char *nf = cface(val);
+                    int nv = cval(val);
+                    ptotal += nv;
+                    printf("You got a %s of %s worth %d.\n", nf, ns, nv);
+                    if(ptotal < 21){
+                        if(nv==1){
+                            if(ptotal+10 == 21){
+                                ptotal += 10;
+                                printf("Congrats! You got 21! Payout is 2-to-1.\n");
+                                balance += (pot*2);
+                                break;
+                            }//end if
+                            else{
+                                int input;
+                                printf("You've got an ace. Choose whether you want to make it count as 1 or 11.\n");
+                                scanf("%d",&input);
+                                if(input == 11)
+                                    ptotal += 10;
+                        }//end else
+                    }//end 3rd if
+                }//end 2nd if
+                else if(ptotal == 21){
+                    printf("Congrats! You got 21!\n");
+                    break;
+                }//end else if
+                else{
+                    printf("Oh no, you've busted with %d. Try Again!\n", ptotal);
+                    break;
+                }//end else
+            }//end 1st if in while loop
+            else if(strcmp(input,"help")==0){
+                printf("Type 'hit' to be dealt another card. Type 'stand' to hold.\n");
+                }//end else if for help
+            else if(strcmp(input, "quit")==0){
+                quit();
+                printf("Enter 'hit' or 'stand'.\n");
+            }//end else if for quit
+            else
+                printf("Invalid command, try again.\n");
+                printf("Your new total is %d.\n", ptotal);
+                scanf("%5s", input);
+            }//end while
+        }//end else
+
+        if(ptotal < 21){
+
+            printf("The dealer's flips a %s of %s worth %d.\n", cf4, cn4, cv4);
+            dtotal += cv4;
+            if(cv4 == 1){
+            if(dtotal+11 < 21){
+                dtotal += 10;
+                }//end nested if
+            }//end if
+
+            if(dtotal >= 16){
+            printf("The dealer stands with %d.\n", dtotal);
+            }//end if
+
+            while(dtotal < 16){
+                int val = hit(&inc);
+                char *ns = csuit(val);
+                char *nf = cface(val);
+                int nv = cval(val);
+                dtotal += nv;
+                printf("The dealer got a %s of %s worth %d.\n", nf, ns, nv);
+                if(dtotal < 16){
+                    if(nv==1){
+                        if(dtotal+11<21){
+                            dtotal += 10;
+                            }//end nested if
+                    }//end if
+                }//end 1st if
+                else if(dtotal == 21){
+                    printf("The dealer just got 21.\n");
+                    break;
+                }else if(dtotal > 21){
+                    printf("The dealer busted with %d! You win!\n", dtotal);
+                    break;
+                }else{
+                    printf("The dealer stands with %d.\n", dtotal);
+                    break;
+                }//end last else
+                printf("The dealer's new total is %d.\n", dtotal);
+            }//end while
+
+            if(dtotal<ptotal){
+                printf("You beat the dealer! Your payout is %d.\n", (int)(pot*1.5));
+                balance += (pot*1.5);
+            }else if(dtotal==ptotal){
+                printf("Its a tie! Push pot, 1-to-1 payout of %d.\n", pot);
+                balance += pot;
+            }else if(dtotal>ptotal && dtotal <= 21){
+                printf("Oh no! Looks like the dealer won. Try again!\n");
+            }else{
+                printf("You beat the dealer! Your payout is %d.\n", (int)(pot*1.5));
+                balance += (pot*1.5);
+            }//end last else
+        }//end initial if
+        if(balance > 0){
+            printf("Your new balance is %d.\n", balance);
+            }//end if
+        }//end void turn
+
+    void checkAce(int v1, int v2, int *a1){
+
+            if(v1 == 1 || v2 == 1){
+            int input;
+            if(v1 == 1 && v2 == 1){
+                v1 = 11;
+                v2 = 1;
+                *a1 = 12;
+                printf("Since you got 2 Aces, we set one to be worth 11 and the other to be worth 1.\n");
+            }else if(v1 == 1 || v2 == 1){
+                if(v1+10+v2 == 21){
+                    *a1 == 21;
+                    }//end if
+                    else{
+                        printf("You've got an ace. Choose whether you want to make it count as 1 or 11.\n");
+                        scanf("%d",&input);
+                    if(input == 11){
+                    *a1 += 10;}//end if
+                    }//end else
+                }//end else if
+            }//end first if
+        }//end check Ace
+
+        int cval(int v){
+            int a;
+            if(((v%13)+1)<10){
+                a = v%13+1;
+                }//end if
+            else{
+                a = 10;}//end else
+            return a;
+        }//end int cval
+
+        char *csuit(int v){
+            v = v%4;
+            switch(v){
+                case 0 :
+                    return "Hearts";
+                case 1 :
+                    return "Clubs";
+                case 2 :
+                    return "Diamonds";
+                case 3 :
+                    return "Spades";
+            }//end switch
+        }//end suit block
+
+        char *cface(int v){
+            v = v%13+1;
+            char *output;
+            switch(v){
+                case 1 :
+                    output = "Ace";
+                    break;
+                case 2 :
+                    output = "Two";
+                    break;
+                case 3 :
+                    output = "Three";
+                    break;
+                case 4 :
+                    output = "Four";
+                    break;
+                case 5 :
+                    output = "Five";
+                    break;
+                case 6 :
+                    output = "Six";
+                    break;
+                case 7 :
+                    output = "Seven";
+                    break;
+                case 8 :
+                    output = "Eight";
+                    break;
+                case 9 :
+                    output = "Nine";
+                    break;
+                case 10 :
+                    output = "Ten";
+                    break;
+                case 11 :
+                    output = "Jack";
+                    break;
+                case 12 :
+                    output = "Queen";
+                    break;
+                case 13 :
+                    output = "King";
+            }//end switch
+            return output;
+        }//end face value block
+
+        void quit(){
+            printf("Are you sure you want to quit? Type 'y' or 'n'.\n");
+            char input[6];
+            scanf("%s",input);
+            if(strcmp(input,"y")==0){
+                exit(0);
+                }//end if
+            else{
+                printf("Quit cancelled.\n");
+                }//end else
+        }//end quit block
+
+        int hit(int *i){
+            int a = sdeck[*i];
+            *i = *i + 1;
+            return a;
+        }//end hit block
+
+        void bet(){
+            char input[6];
+            int val;
+            printf("Enter an amount you would like to bet.\n");
+            scanf("%5s", input);
+            while(strcmp(input, "bet") != 0){
+                if(strcmp(input,"help") == 0){
+                    printf("Type 'bet' followed by a bet amount. For example, you could type 'bet 50'.\n");
+                    }//end if
+                else if(strcmp(input,"quit")==0){
+                    quit();
+                    printf("Enter a bet amount.\n");
+                }else
+                printf("You've entered an invalid command. Type 'help' for a list of valid commands.\n");
+                scanf("%5s", input);
+            }//end while loop
+
+            scanf("%d", &val);
+            while(val > balance || (val < 10  && val > 0) || val <=0){
+                if(val > balance){
+            printf("You cannot bet more than your balance. Your balance is: %d.\n", balance);
+            }//end if
+            else if(val <= 0){
+            printf("You must make a bet. Enter a valid bet amount.\n");
+            }//end else if
+            else{
+            printf("Invalid entry. Try again.\n");
+            }//end else
+            scanf("%d", &val);
+            }//end while loop
+            balance -= val;
+            printf("You've made a bet of %d. Good luck!\n", val);
+            pot = val;
+        }//end bet block
+
+        void initdeck(){
+            int i=0;
+            for(i;i<52;i++){
+                deck[i] = i+1;
+            }//end for loop
+        }//end deck block
+
+        void shuffle(){
+            srand(time(NULL));
+            int i=0;
+            for(i;i<52;i++){
+                sdeck[i] = deck[i];
+            }
+            i=0;
+            for(i=CARDS-1;i>0;i--){
+                int j = rand()%(i+1);
+                int n = sdeck[i];
+                sdeck[i] = sdeck[j];
+                sdeck[j] = n;
+            }//end for loop
+        }//end shuffle block
